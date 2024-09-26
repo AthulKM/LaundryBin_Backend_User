@@ -50,11 +50,12 @@ export const sendOTPMessage = async (phoneNumber, otp, countryCode = '+91') => {
 
 /**
  * Send OTP via Email using Nodemailer
- * @param {string} email - The user's email address
+ * @param {string} identifier - The user's email address
  * @param {string} otp - The OTP to be sent
  * @returns {Promise<void>}
  */
-export const sendEmail = async (email, otp) => {
+export const sendEmail = async (identifier, otp) => {
+  console.log("Email being sent to:", identifier);
   try {
     // const transporter = nodemailer.createTransport({
     //   service: 'gmail',
@@ -81,11 +82,11 @@ export const sendEmail = async (email, otp) => {
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: email,
+      to: identifier,
       subject: 'Your OTP Code',
       text: `Your OTP code is ${otp}`,
     });
-    console.log(`OTP sent to ${email}`);
+    console.log(`OTP sent to ${identifier}}`);
   } catch (error) {
     console.error('Failed to send OTP via email:', error);
     throw new Error('Failed to send OTP via email');
