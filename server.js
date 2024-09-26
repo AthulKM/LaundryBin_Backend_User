@@ -4,7 +4,7 @@ import connectDB from './database/connectDB.js';
 
 import cors from 'cors';
 import user from './routes/userRoutes.js';
-import accountVerificationRoutes from './routes/accountVerificationRoutes.js';
+
 import otpRoutes from './routes/otpRoutes.js';
 
 
@@ -41,7 +41,7 @@ connectDB();
 app.use('/api/user', user);
 // app.use('/api/cart', cart);
 // app.use('/api/wishList', wishList);
-app.use('/api/user', accountVerificationRoutes);
+
 app.use('/api/user', otpRoutes);
 
 app.listen(PORT, () => {

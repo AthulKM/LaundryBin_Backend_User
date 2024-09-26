@@ -1,7 +1,7 @@
 // otpController.js
 
-import { generateOTP, signOTPToken, verifyOTPToken } from '../utils/otpUtils.js';
-import { sendSMS, sendEmail } from '../utils/notificationUtils.js';
+import { generateOTP, signOTPToken, verifyOTPToken, sendEmail } from '../utils/otpUtils.js';
+
 
 export const sendOTP = async (req, res) => {
   const { identifier, password } = req.body;
