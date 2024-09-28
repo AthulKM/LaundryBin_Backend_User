@@ -1,16 +1,24 @@
 // otpController.js
 
-import { generateOTP, signOTPToken, verifyOTPToken, sendEmail } from '../utils/otpUtils.js';
+import OTP from '../models/otp.js';
+import { generateOTP, sendEmail } from '../utils/otpUtils.js';
 
 
 export const sendOTP = async (req, res) => {
-  const { identifier, password } = req.body;
+  const { identifier } = req.body;
 
   // Generate OTP and sign it with the identifier
   const otp = generateOTP();
-  const otpToken = signOTPToken(otp, identifier); // Sign OTP with identifier
+  const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiration
   
-  try {
+    try {
+      
+    // Store OTP in the database
+    await OTP.findOneAndUpdate(
+        { identifier },
+        { otp, expirationTime },
+        { upsert: true, new: true } // Create if doesn't exist, update if exists
+    );
     // Check if identifier is a phone number or email
     if (/^\d{10}$/.test(identifier)) {
       // Phone number
@@ -28,16 +36,21 @@ export const sendOTP = async (req, res) => {
 };
 
 export const verifyOTP = async (req, res) => {
-  const { otp, otpToken, identifier } = req.body;
+  const { otp, identifier } = req.body;
 
   try {
-    // Verify the OTP token and extract the payload
-    const decoded = verifyOTPToken(otpToken);
+    // Retrieve the OTP from the database
+    const otpRecord = await OTP.findOne({ identifier });
 
-    // Check if the OTP matches and identifier is the same
-    if (decoded.otp !== parseInt(otp, 10) || decoded.identifier !== identifier) {
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'OTP not found or expired' });
+    }
+
+    // Check if the OTP matches
+    if (otpRecord.otp !== parseInt(otp, 10)) {
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
     }
+    
 
     // OTP is valid
     res.status(200).json({ success: true, message: 'OTP verified successfully' });

@@ -33,34 +33,6 @@ export const registerUser = async (req, res) => {
     if (existingEmailOrPhone) {
       return res.status(400).json({ message: 'Email or phone number already in use' });
     }
-
-    // // OTP verification flow
-    // if (!otpToken) {
-    //   // Generate OTP and sign it with a JWT
-    //   const generatedOtp = generateOTP();
-    //   const otpJWT = signOTPToken(generatedOtp, phoneNumber);
-
-    //   // Send the OTP using your Twilio utility (assumed to be already implemented)
-    //   await sendOTPMessage(phoneNumber, generatedOtp);
-
-    //   return res.status(200).json({
-    //     message: `OTP sent to ${phoneNumber}. Please verify.`,
-    //     otpToken: otpJWT, // Return the signed OTP token
-    //     otpSent: true,
-    //   });
-    // } else {
-    //   // Step 2: Verify the provided OTP token
-    //   const decodedToken = verifyOTPToken(otpToken);
-      
-    //   if (decodedToken.otp !== otp || decodedToken.phoneNumber !== phoneNumber) {
-    //     return res.status(400).json({ message: 'Invalid OTP. Please try again.' });
-    //   }
-
-    //   // OTP verified, proceed to registration
-    // }
-
-
-
     
     // Hash the password before saving
       let hashedPassword = await bcrypt.hash(password, 10);
@@ -91,38 +63,7 @@ export const registerUser = async (req, res) => {
 };
 
 
-// Controller to login a user
-// export const loginUser = async (req, res) => {
-//     const { email, password } = req.body;
 
-//     // Find user by email
-//     const user = await User.findOne({ email });
-
-//     if (user && (await bcrypt.compare(password, user.password))) {
-//         const token = jwt.sign(
-//             {
-//                 id: user._id,
-//                 email: user.email,
-//                 phoneNumber: user.phoneNumber
-//             },
-//             JWT_SECRET,
-//             { expiresIn: '1h' }
-//         );
-//         res.status(200).json({
-//             message:"Login successful",
-//             _id: user._id,
-//             email: user.email,
-//             phoneNumber: user.phoneNumber,
-//             username: user.username,
-//             role: user.role,
-//             status: "Success",
-//             token:token,
-//             error:false
-//         });
-//     } else {
-//         res.status(401).json({ message: 'Invalid email/phone number or password' });
-//     }
-// };
 
 // Login route handler (Express)
 export const loginUser = async (req, res) => {
