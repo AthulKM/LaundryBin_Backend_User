@@ -1,7 +1,11 @@
 import User from '../models/user.js';
+import OTP from '../models/otp.js';
+import { generateOTP, sendOTPMessage, sendEmail } from '../utils/otpUtils.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+
 
 
 dotenv.config();
@@ -72,7 +76,7 @@ export const loginUser = async (req, res) => {
     try {
       // Check if the identifier is an email or phone number
       const isPhoneNumber = /^[0-9]{10}$/.test(identifier);
-      const query = isPhoneNumber ? { phoneNumber: identifier } : { email: identifier };
+      const query = isPhoneNumber ? { "phoneNumber": identifier } : { "email": identifier };
   
       // Find user by email or phone number
       const user = await User.findOne(query);
@@ -81,24 +85,30 @@ export const loginUser = async (req, res) => {
         return res.status(401).json({ message: 'User not found' });
       }
   
-      // Compare password (assuming you hash the password with bcrypt)
+      // Compare password 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Invalid password' });
       }
   
-      // If the user exists and password matches, generate a token (e.g., JWT)
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-        expiresIn: '1h', // Token expiration time
-      });
+      // Generate OTP
+      const otp = generateOTP();
+
+      // Send OTP based on the identifier
+      if (isPhoneNumber) {
+        await sendOTPMessage(user.phoneNumber, otp);
+      } else {
+        await sendEmail(user.email, otp);
+      }
+
   
-      // Send a success response with the token
-      return res.json({
-        message: 'Login successful',
-        token,
-        data: user,
-        success:true
+      // Respond with a message, OTP sent but user is not yet authenticated
+      return res.status(200).json({
+        message: `OTP sent to ${isPhoneNumber ? user.phoneNumber : user.email}`,
+        userId: user._id, // Return userId to reference later for OTP verification
+        otp,  // Remove this in production (for testing purposes only)
+        success: true,
       });
     } catch (error) {
       console.error(error); // Log the error for debugging

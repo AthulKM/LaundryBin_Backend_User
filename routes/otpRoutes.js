@@ -1,14 +1,14 @@
 // otpRoutes.js
 
 import express from 'express';
-import { sendOTP, verifyOTP } from '../controllers/otpController.js';
+import { verifyLoginOTP } from '../utils/otpUtils.js';
+
 
 const router = express.Router();
 
-// Route for OTP generation
-router.post('/send-otp', sendOTP);
+
 
 // Route for OTP verification
-router.post('/verify-otp', verifyOTP);
+router.post('/verify-otp', verifyLoginOTP);
 
 export default router;
