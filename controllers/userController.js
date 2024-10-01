@@ -95,6 +95,13 @@ export const loginUser = async (req, res) => {
       // Generate OTP
       const otp = generateOTP();
 
+      const newOtpEntry = new OTP({
+        identifier,  // Use phone number or email as identifier
+        otp
+    });
+    
+    await newOtpEntry.save();
+
       // Send OTP based on the identifier
       if (isPhoneNumber) {
         await sendOTPMessage(user.phoneNumber, otp);
