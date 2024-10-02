@@ -121,7 +121,84 @@ export const loginUser = async (req, res) => {
       console.error(error); // Log the error for debugging
       return res.status(500).json({ message: 'Server error' });
     }
-  };
+};
+  
+
+
+// Forgot Password - Send OTP to Email/Phone
+export const forgotPassword = async (req, res) => {
+  const { identifier } = req.body;
+
+  try {
+    // Check if the identifier is a phone number or email
+    const isPhoneNumber = /^[0-9]{10}$/.test(identifier);
+    const query = isPhoneNumber ? { "phoneNumber": identifier } : { "email": identifier };
+
+    // Find the user by email or phone number
+    const user = await User.findOne(query);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
+
+    // Save OTP in the database (upsert to avoid duplicate entries)
+    await OTP.findOneAndUpdate(
+      { identifier },
+      { otp, expirationTime },
+      { upsert: true, new: true }
+    );
+
+    // Send OTP based on identifier
+    if (isPhoneNumber) {
+      await sendOTPMessage(user.phoneNumber, otp);
+    } else {
+      await sendEmail(user.email, otp);
+    }
+
+    return res.status(200).json({
+      message: `OTP sent to ${isPhoneNumber ? user.phoneNumber : user.email}`,
+      success: true,
+      otp:otp
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+// Reset Password - Verify OTP and Update Password
+export const resetPassword = async (req, res) => {
+  const { identifier, otp, newPassword } = req.body;
+
+  try {
+    // Check if OTP is valid
+    const otpEntry = await OTP.findOne({ identifier });
+
+    if (!otpEntry || otpEntry.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    // If OTP is valid, update the user's password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const query = /^[0-9]{10}$/.test(identifier) ? { "phoneNumber": identifier } : { "email": identifier };
+
+    await User.findOneAndUpdate(query, { password: hashedPassword });
+
+    // Optionally, you can delete the OTP entry after successful password reset
+    await OTP.findOneAndDelete({ identifier });
+
+    return res.status(200).json({ message: 'Password reset successful', success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 
 // Controller to get all users
 export const getAllUsers = async (req, res) => {
