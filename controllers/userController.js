@@ -97,6 +97,7 @@ export const loginUser = async (req, res) => {
       const otp = generateOTP();
 
       const newOtpEntry = new OTP({
+        userId : user._id,
         identifier,  // Use phone number or email as identifier
         otp
     });
@@ -117,6 +118,7 @@ export const loginUser = async (req, res) => {
         userId: user._id, // Return userId to reference later for OTP verification
         otp,  // Remove this in production (for testing purposes only)
         success: true,
+        data:user.username
       });
     } catch (error) {
       console.error(error); // Log the error for debugging
@@ -128,7 +130,7 @@ export const loginUser = async (req, res) => {
 
 // Forgot Password - Send OTP to Email/Phone
 export const forgotPassword = async (req, res) => {
-  const { identifier } = req.body;
+  const { identifier, userId } = req.body;
 
   try {
     // Check if the identifier is a phone number or email
@@ -162,7 +164,8 @@ export const forgotPassword = async (req, res) => {
     return res.status(200).json({
       message: `OTP sent to ${isPhoneNumber ? user.phoneNumber : user.email}`,
       success: true,
-      otp:otp
+      otp: otp,
+      data:user._id
     });
   } catch (error) {
     console.error(error);

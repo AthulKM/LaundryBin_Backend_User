@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 const otpSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },  // Reference to User model
   identifier: {
     type: String,
     required: true,
@@ -16,7 +20,7 @@ const otpSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Automatically remove expired OTPs
-otpSchema.index({ expirationTime: 300 }, { expireAfterSeconds: 600 });
+otpSchema.index({ expirationTime: 1 }, { expireAfterSeconds: 0 });
 
 const OTP = mongoose.model('OTP', otpSchema);
 
