@@ -127,7 +127,7 @@ export const verifyPasswordResetOTP = async (req, res) => {
 
     // Respond with success and the token
     return res.status(200).json({
-      message: 'Login successful',
+      message: 'Set a new password',
       token,
       success: true,
     });

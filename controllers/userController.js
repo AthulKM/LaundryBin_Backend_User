@@ -174,27 +174,16 @@ export const forgotPassword = async (req, res) => {
 };
 
 
-// Reset Password - Verify OTP and Update Password
+// Reset Password - Update Password
 export const resetPassword = async (req, res) => {
-  const { identifier, otp, newPassword } = req.body;
+  const { userId, newPassword } = req.body;
 
   try {
-    // Check if OTP is valid
-    const otpEntry = await OTP.findOne({ identifier });
-
-    if (!otpEntry || otpEntry.otp !== otp) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
-
-    // If OTP is valid, update the user's password
+    console.log(userId);
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    const query = /^[0-9]{10}$/.test(identifier) ? { "phoneNumber": identifier } : { "email": identifier };
+    await User.findOneAndUpdate({ _id:userId }, { password: hashedPassword });
 
-    await User.findOneAndUpdate(query, { password: hashedPassword });
-
-    // Optionally, you can delete the OTP entry after successful password reset
-    await OTP.findOneAndDelete({ identifier });
-
+    
     return res.status(200).json({ message: 'Password reset successful', success: true });
   } catch (error) {
     console.error(error);
