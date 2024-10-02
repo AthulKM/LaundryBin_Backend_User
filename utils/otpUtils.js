@@ -43,8 +43,8 @@ export const sendOTP = async (req, res) => {
 };
 
 export const verifyLoginOTP = async (req, res) => {
-  const { userId, otp } = req.body;
-  console.log(`${userId}, ${otp}`);
+  const { otp, userId } = req.body;
+  console.log(` ${otp}`);
   try {
     // Find the user by their ID
     const user = await User.findById(userId);

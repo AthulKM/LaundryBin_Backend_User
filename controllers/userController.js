@@ -82,6 +82,7 @@ export const loginUser = async (req, res) => {
       const user = await User.findOne(query);
       
       if (!user) {
+        console.log(isPhoneNumber);
         return res.status(401).json({ message: 'User not found' });
       }
   

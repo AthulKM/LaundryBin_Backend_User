@@ -16,7 +16,7 @@ const otpSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Automatically remove expired OTPs
-otpSchema.index({ expirationTime: 1800 }, { expireAfterSeconds: 900 });
+otpSchema.index({ expirationTime: 300 }, { expireAfterSeconds: 600 });
 
 const OTP = mongoose.model('OTP', otpSchema);
 
