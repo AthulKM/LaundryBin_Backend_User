@@ -7,6 +7,9 @@ const itemSchema = new mongoose.Schema({
         default: 'Shirt',
         required: true
     },
+    image: {
+        type: String
+    },
     charge: {
         type: Number,  
         required: true, 

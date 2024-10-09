@@ -1,22 +1,61 @@
 
 import Item from '../models/item.js';
+import cloudinary from '../utils/cloudinary.js';
+import { resetPassword } from './userController.js';
+
+
 
 // Create a new Item
 export const createItem = async (req, res) => {
   try {
-    const { itemName, charge, count } = req.body;
+      const { itemName, charge, count } = req.body;
+      
+      const existingItem = await Item.findOne({ itemName });
 
+      if (existingItem) {
+        return res.status(400).json({
+            Message: "Item already exists",
+            status: "Failed",
+            error: true
+        });
+      }
+
+      let imageUrl = '';
+      if (req.file) {
+          //   Upload image to Cloudinary
+          const result = await cloudinary.uploader.upload(req.file.path, {
+              folder: 'items',
+              //   Optional: organize images in folders
+              resource_type: 'image'
+          });
+          imageUrl = result.secure_url;
+        //   Get the secure URL for the image
+      }
     // Ensure required fields are provided
     if (!itemName || charge === undefined || count === undefined) {
       return res.status(400).json({ message: 'Item name, charge, and count are required.' });
     }
 
-    const newItem = new Item({ itemName, charge, count });
+      const newItem = new Item({
+          itemName,
+          charge,
+          count,
+          image: imageUrl
+        
+    });
     await newItem.save();
-    return res.status(201).json({ message: 'Item created successfully', data: newItem });
+      return res.status(201).json({
+          message: 'Item created successfully',
+          error: false,
+          status: "Success",
+          data: newItem
+      });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error, failed to create item.' });
+      return res.status(500).json({
+          message: 'Server error, failed to create item.',
+          error:true
+      });
   }
 };
 
@@ -57,14 +96,26 @@ export const getItemById = async (req, res) => {
 
 // Update an existing Item by ID
 export const updateItemById = async (req, res) => {
-  const { id } = req.params;
-  const { itemName, charge, count } = req.body;
+    const { id } = req.params;
+    const { itemName, charge, count,image } = req.body;
+    const updatedData = {itemName, charge, count,image}
+    
 
+
+  if (req.file) {
+    // Upload new image to Cloudinary (if file exists)
+    const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'items',
+        resource_type: 'image'
+    });
+    updatedData.image = result.secure_url;  // Store the new image URL
+}  
+    
   try {
     // Find item by ID and update
     const updatedItem = await Item.findByIdAndUpdate(
       id,
-      { itemName, charge, count },
+      updatedData,
       { new: true, runValidators: true }
     );
     
