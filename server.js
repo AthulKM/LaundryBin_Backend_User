@@ -6,6 +6,8 @@ import cors from 'cors';
 import user from './routes/userRoutes.js';
 import item from './routes/itemRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
+import instructionRoutes from './routes/instructionRoutes.js';
+
 
 
 
@@ -43,7 +45,8 @@ app.use('/api/user', user);
 // app.use('/api/wishList', wishList);
 
 app.use('/api/user', otpRoutes);
-app.use('/api/items',item)
+app.use('/api/items', item);
+app.use('/api/instructions', instructionRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
