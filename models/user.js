@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+const addressSchema = new mongoose.Schema({
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    postalCode: { type: String, required: true }
+});
+  
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -27,6 +34,7 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'], // Only 'user' and 'admin' are allowed
         default: 'user', // Default role is 'user'
     },
+    addresses: [addressSchema] 
 }, {
     timestamps: true,
 });

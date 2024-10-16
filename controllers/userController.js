@@ -241,7 +241,7 @@ export const getUserById = async (req, res) => {
 // Update user data using findByIdAndUpdate
 export const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { email,phoneNumber, username, password, role } = req.body;
+    const { email,phoneNumber, username, password, role,addresses  } = req.body;
 
     try {
         // Prepare the fields to update
@@ -253,10 +253,34 @@ export const updateUser = async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             updateData.password = await bcrypt.hash(password, salt); // Hash the new password
         }
-        if (role) updateData.role = role;
+      if (role) updateData.role = role;
+      
+      // Handle addresses
+      if (addresses) {
+        const newAddress = {
+            street: addresses.street,
+            city: addresses.city,
+            state: addresses.state,
+            postalCode: addresses.postalCode
+        };
+        // Find the user by ID and add new address to their addresses array
+        const user = await User.findById(id);
+
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+         // Push new address to addresses array
+         user.addresses.push(newAddress);
+
+         // Save the updated user
+         await user.save();
+
+         updateData.addresses = user.addresses;
+      }
 
         // Find the user by ID and update
-        const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+      const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+      
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
@@ -268,6 +292,7 @@ export const updateUser = async (req, res) => {
             email: updatedUser.email,
             phoneNumber: updatedUser.phoneNumber,
             username: updatedUser.username,
+            addresses: updatedUser.addresses,
             status: "Success",
             error: false
         });
