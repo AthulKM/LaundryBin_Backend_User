@@ -25,7 +25,7 @@ export const createOrder = async (req, res) => {
 // Get all orders
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate('user', 'name email');
+    const orders = await Order.find().populate('user');
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
