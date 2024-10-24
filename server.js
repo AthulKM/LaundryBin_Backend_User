@@ -7,7 +7,8 @@ import user from './routes/userRoutes.js';
 import item from './routes/itemRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
 import instructionRoutes from './routes/instructionRoutes.js';
-
+import orderRoutes from './routes/orderRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
 
 
@@ -47,6 +48,8 @@ app.use('/api/user', user);
 app.use('/api/user', otpRoutes);
 app.use('/api/items', item);
 app.use('/api/instructions', instructionRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
