@@ -34,7 +34,11 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'], // Only 'user' and 'admin' are allowed
         default: 'user', // Default role is 'user'
     },
-    addresses: [addressSchema] 
+    addresses: [addressSchema],
+    profilePicture: {
+        type: String, // URL of the image
+        required: false, // Optional field
+    }
 }, {
     timestamps: true,
 });

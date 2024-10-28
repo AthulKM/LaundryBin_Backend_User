@@ -4,7 +4,8 @@ import { generateOTP, sendOTPMessage, sendEmail } from '../utils/otpUtils.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+
+import cloudinary from '../utils/cloudinary.js';
 
 
 
@@ -39,14 +40,27 @@ export const registerUser = async (req, res) => {
     }
     
     // Hash the password before saving
-      let hashedPassword = await bcrypt.hash(password, 10);
+    let hashedPassword = await bcrypt.hash(password, 10);
+    
+    let imageUrl = '';
+      if (req.file) {
+          //   Upload image to Cloudinary
+          const result = await cloudinary.uploader.upload(req.file.path, {
+              folder: 'userPics',
+              //   Optional: organize images in folders
+              resource_type: 'image'
+          });
+          imageUrl = result.secure_url;
+        //   Get the secure URL for the image
+      }
       
       // Create a new user object
     const newUser = new User({
         username,
         email,
         phoneNumber,
-        password : hashedPassword,
+      password: hashedPassword,
+      profilePicture: imageUrl
       });
   
 
