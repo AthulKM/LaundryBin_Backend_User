@@ -82,6 +82,7 @@ export const verifyLoginOTP = async (req, res) => {
       message: 'Login successful',
       token,
       success: true,
+      data:user
     });
   } catch (error) {
     console.error(error);

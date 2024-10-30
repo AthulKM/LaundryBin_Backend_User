@@ -255,7 +255,17 @@ export const getUserById = async (req, res) => {
 // Update user data using findByIdAndUpdate
 export const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { email,phoneNumber, username, password, role,addresses  } = req.body;
+  const { email, phoneNumber, username, password, role, addresses } = req.body;
+  
+
+  if (req.file) {
+    // Upload new image to Cloudinary (if file exists)
+    const result = await cloudinary.uploader.uploadProfilePicture(req.file.path, {
+        folder: '',
+        resource_type: 'image'
+    });
+    updatedData.image = result.secure_url;  // Store the new image URL
+} 
 
     try {
         // Prepare the fields to update
@@ -277,6 +287,8 @@ export const updateUser = async (req, res) => {
             state: addresses.state,
             postalCode: addresses.postalCode
         };
+
+        
         // Find the user by ID and add new address to their addresses array
         const user = await User.findById(id);
 
