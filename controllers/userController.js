@@ -258,14 +258,7 @@ export const updateUser = async (req, res) => {
   const { email, phoneNumber, username, password, role, addresses } = req.body;
   
 
-  if (req.file) {
-    // Upload new image to Cloudinary (if file exists)
-    const result = await cloudinary.uploader.uploadProfilePicture(req.file.path, {
-        folder: '',
-        resource_type: 'image'
-    });
-    updatedData.image = result.secure_url;  // Store the new image URL
-} 
+  
 
     try {
         // Prepare the fields to update
@@ -277,6 +270,14 @@ export const updateUser = async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             updateData.password = await bcrypt.hash(password, salt); // Hash the new password
         }
+        if (req.file) {
+          // Upload new image to Cloudinary (if file exists)
+          const result = await cloudinary.uploader.upload(req.file.path, {
+              folder: 'uploads/profilePictures/',
+              resource_type: 'image'
+          });
+          updateData.profilePicture = result.secure_url;  // Store the new image URL
+      } 
       if (role) updateData.role = role;
       
       // Handle addresses

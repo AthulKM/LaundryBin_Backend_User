@@ -10,6 +10,7 @@ import instructionRoutes from './routes/instructionRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import orderTrackingRoutes from './routes/orderTrackingRoutes.js';
 
 
 
@@ -52,6 +53,8 @@ app.use('/api/instructions', instructionRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/orderTracking', orderTrackingRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
