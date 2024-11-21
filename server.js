@@ -22,7 +22,7 @@ const PORT = process.env.PORT || 8004;
 app.use(express.json());
 
 // Allow specific origins
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = ['https://laundrybinapp.netlify.app/','http://localhost:5173', 'http://localhost:5174'];
 
 app.use(cors({
   origin: function (origin, callback) {
