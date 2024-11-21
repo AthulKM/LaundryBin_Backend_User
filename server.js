@@ -22,7 +22,16 @@ const PORT = process.env.PORT || 8004;
 app.use(express.json());
 
 // Allow specific origins
-const allowedOrigins = ['https://laundrybinapp.netlify.app/','http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = ['https://laundrybinapp.netlify.app','http://localhost:5173', 'http://localhost:5174'];
+
+// Allow CORS from Netlify frontend
+const corsOptions = {
+  origin: 'https://laundrybinapp.netlify.app', // Allow only frontend's URL
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // Include cookies or authentication headers
+};
+
+app.use(cors(corsOptions));
 
 app.use(cors({
   origin: function (origin, callback) {
