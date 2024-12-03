@@ -2,15 +2,12 @@ import jwt from 'jsonwebtoken';
 import twilio from 'twilio';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-
 import OTP from '../models/otp.js';
 import User from '../models/user.js';
 
 dotenv.config();
-
 // Generate a 6-digit OTP
 export const generateOTP = () => Math.floor(100000 + Math.random() * 900000);
-
 export const sendOTP = async (req, res) => {
   const { identifier } = req.body;
 
@@ -41,14 +38,12 @@ export const sendOTP = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error sending OTP' });
   }
 };
-
 export const verifyLoginOTP = async (req, res) => {
   const { otp, userId } = req.body;
   console.log(` ${otp}`);
   try {
     // Find the user by their ID
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
@@ -57,26 +52,20 @@ export const verifyLoginOTP = async (req, res) => {
       identifier: user.email || user.phoneNumber, // Look up by email or phone number
       otp,
     });
-
     if (!otpRecord) {
       return res.status(401).json({ message: 'Invalid OTP' });
     }
-
     // Check if OTP has expired
     if (otpRecord.expirationTime < new Date(Date.now())) {
       await OTP.deleteOne({ _id: otpRecord._id }); // Clean up expired OTP
       return res.status(401).json({ message: 'OTP expired' });
     }
-    
-
     // OTP is valid, delete OTP after successful verification
     await OTP.deleteOne({ _id: otpRecord._id });
-
     // Generate JWT token after successful OTP verification
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '1h', // Token expiration time
     });
-
     // Respond with success and the token
     return res.status(200).json({
       message: 'Login successful',
