@@ -26,8 +26,9 @@ const allowedOrigins = ['https://laundrybinapp.netlify.app','https://laundrybin.
 
 // Allow CORS from Netlify frontend
 const corsOptions = {
-  origin: 'http://localhost:5173' ,
-  // https://laundrybinapp.netlify.app', // Allow only frontend's URL
+  origin:
+    // 'http://localhost:5173',
+  'https://laundrybinapp.netlify.app', // Allow only frontend's URL
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true, // Include cookies or authentication headers
 };
